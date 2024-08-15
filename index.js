@@ -135,19 +135,29 @@ async function run() {
       const filter = req.query.filter;
       const sort = req.query.sort;
       const availability = req.query.availability;
+      const dateSort = req.query.dateSort;
       let query = {
-        posterEmail: email,
+        // reqEmail: email,
       };
       if (search) {
-        query = { productName: { $regex: search, $options: 'i' } };
+        query = { product_name: { $regex: search, $options: 'i' } };
       }
-      if (filter) query.productType = filter;
-      if (availability) query.status = availability;
+      if (filter) query.brand = filter;
+      if (availability) query.category = availability;
+
       let options = {};
+      let currentDate = new Date();
+      let lastMonthDate = new Date();
+      lastMonthDate.setMonth(lastMonthDate.getMonth() - 1);
+      if (dateSort)
+        query.added_time = {
+          $gte: lastMonthDate.toISOString(),
+          $lt: currentDate.toISOString(),
+        };
 
       const result = await productCollection
         .find(query)
-        .sort({ productQty: sort === 'asc' ? 1 : -1 })
+        .sort({ price: sort === 'asc' ? 1 : -1 })
         .skip(page * size)
         .limit(size)
         .toArray();
@@ -211,6 +221,7 @@ async function run() {
       const search = req.query.search;
       const filter = req.query.filter;
       const sort = req.query.sort;
+
       let query = {
         reqEmail: email,
       };
@@ -229,22 +240,6 @@ async function run() {
         .toArray();
       res.send(result);
     });
-    //01777311537
-    //get all pending asset for employee home page
-
-    app.get('/pending-request/:email', async (req, res) => {
-      const email = req.params.email;
-      const filter = req.query.filter;
-      const userQuery = { email: email };
-      const query = { reqEmail: email };
-      const userData = await userCollection.findOne(userQuery);
-      if (filter) query.reqStatus = filter;
-      const result = await requestCollection.find(query).toArray();
-      res.send({ result, userData });
-    });
-    //get all pending asset for Hr manager home page
-
-    //get all request  for employee home page
 
     app.get('/empAll-request/:email', async (req, res) => {
       const email = req.params.email;
@@ -313,28 +308,6 @@ async function run() {
     app.get('/assetsCount', async (req, res) => {
       const count = await productCollection.estimatedDocumentCount();
       res.send({ count });
-    });
-
-    app.post('/create-payment-intent', async (req, res) => {
-      const { price } = req.body;
-      const amount = parseInt(price * 100);
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount: amount,
-        currency: 'usd',
-        payment_method_types: ['card'],
-      });
-      res.send({ clientSecret: paymentIntent.client_secret });
-    });
-
-    app.post('/payments', async (req, res) => {
-      const payment = req.body;
-      const email = req.body.email;
-      const query = { email };
-      // payment.menuItemId = payment.menuItemId.map(id => new ObjectId(id));
-      // payment.cartId = payment.cartId.map(id => new ObjectId(id));
-      const result = await paymentCollection.insertOne(payment);
-
-      res.send(result);
     });
 
     //mr manager payment check
