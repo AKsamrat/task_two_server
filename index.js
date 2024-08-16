@@ -185,56 +185,6 @@ async function run() {
         .toArray();
       res.send(result);
     });
-    //get top requested asset api==========<<<<<<<<<<<<<<<
-    app.get('/topReq-items/:email', async (req, res) => {
-      const size = parseInt(req.query.size);
-      const email = req.params.email;
-      const sort = req.query.sort;
-      const query = { posterEmail: email };
-
-      const result = await assetCollection
-        .find(query)
-        .sort({ reqCount: sort === 'dec' ? -1 : 1 })
-        .limit(size)
-        .toArray();
-      res.send(result);
-    });
-    //get limited stock items api==========<<<<<<<<<<<<<<<
-    app.get('/limitedStock-items/:email', async (req, res) => {
-      const size = parseInt(req.query.size);
-      const email = req.params.email;
-      const sort = req.query.sort;
-
-      const result = await assetCollection
-        .find({ posterEmail: email, productQty: { $lt: 10 } })
-        .sort({ productQty: sort === 'asc' ? 1 : -1 })
-        .limit(size)
-        .toArray();
-      res.send(result);
-    });
-
-    //get all asset asset for employee ======<<<<<<<<<<<<<<
-
-    app.get('/employee-assets', async (req, res) => {
-      const size = parseInt(req.query.size);
-      const page = parseInt(req.query.page);
-      const search = req.query.search;
-      const filter = req.query.filter;
-      const sort = req.query.sort;
-      let query = {
-        productName: { $regex: search, $options: 'i' },
-      };
-      if (filter) query.productType = filter;
-      if (sort) query.status = sort;
-
-      const result = await assetCollection
-        .find(query)
-        .skip(page * size)
-        .limit(size)
-        .toArray();
-      res.send(result);
-    });
-    //get all requested asset for employee ======<<<<<<<<<<<<<<
 
     app.get('/requested-assets/:email', async (req, res) => {
       const email = req.params.email;
