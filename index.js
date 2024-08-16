@@ -7,7 +7,11 @@ const port = process.env.PORT || 5000;
 const app = express();
 
 const corsOptions = {
-  origin: ['http://localhost:5173', 'http://localhost:5174'],
+  origin: [
+    'http://localhost:5173',
+    'https://scic-task-two.netlify.app',
+    'http://dragon-news-b9bf2.web.app',
+  ],
   credentials: true,
   optionSuccessStatus: 200,
 };
@@ -47,84 +51,7 @@ async function run() {
 
     //product collection api-----------------------
 
-    //load all user
-    app.get('/all-users', async (req, res) => {
-      // console.log(req.headers);
-      const size = parseInt(req.query.size);
-      const page = parseInt(req.query.page);
-      const filter = {
-        role: 'employee',
-      };
-      const result = await userCollection
-        .find(filter)
-        .skip(page * size)
-        .limit(size)
-        .toArray();
-      res.send(result);
-    });
-    //for pagination count
-
-    //get my employee===============<<<<<<<<<<<<<<<<<<hr manager
-    app.get('/my-employee/:email', async (req, res) => {
-      const email = req.params.email;
-      // console.log(req.headers);
-      const size = parseInt(req.query.size);
-      const page = parseInt(req.query.page);
-      const query = { hrEmail: email };
-
-      const result = await teamCollection
-        .find(query)
-        .skip(page * size)
-        .limit(size)
-        .toArray();
-      res.send(result);
-    });
-    //get my team===============<<<<<<<<<<<<<<<<<<for employee
-    app.get('/my-team/:email', async (req, res) => {
-      const empEmail = req.params.email;
-      const empQuery = { email: empEmail };
-      const userData = await userCollection.findOne(empQuery);
-      const hrData = userData?.hrData;
-      const email = hrData?.hrEmail;
-      const size = parseInt(req.query.size);
-      const page = parseInt(req.query.page);
-      const query = { hrEmail: email };
-
-      const result = await teamCollection
-        .find(query)
-        .skip(page * size)
-        .limit(size)
-        .toArray();
-      res.send(result);
-    });
-
     //save user data in db hr and employee
-
-    //profile update================
-    app.patch('/profile-update/:email', async (req, res) => {
-      const email = req.params.email;
-      const updateData = req.body;
-      const query = { email: email };
-      const updateDoc = {
-        $set: {
-          name: updateData.name,
-          updateDate: new Date(),
-        },
-      };
-      const result = await userCollection.updateOne(query, updateDoc);
-      res.send(result);
-    });
-
-    //asset add api =========================>>>>
-    app.post('/addAsset', async (req, res) => {
-      const assetData = req.body;
-      const pName = assetData.productName;
-      const query = { productName: pName };
-      const isExist = await assetCollection.findOne(query);
-      if (isExist) return 'Product Already exist';
-      const result = await assetCollection.insertOne(assetData);
-      res.send(result);
-    });
 
     //get all asset api==========<<<<<<<<<<<<<<<
     app.get('/all-product', async (req, res) => {
@@ -186,80 +113,7 @@ async function run() {
       res.send(result);
     });
 
-    app.get('/requested-assets/:email', async (req, res) => {
-      const email = req.params.email;
-      const size = parseInt(req.query.size);
-      const page = parseInt(req.query.page);
-      const search = req.query.search;
-      const filter = req.query.filter;
-      const sort = req.query.sort;
-
-      let query = {
-        reqEmail: email,
-      };
-      if (search) {
-        query = {
-          assetName: { $regex: search, $options: 'i' },
-        };
-      }
-      if (filter) query.assetType = filter;
-      if (sort) query.reqStatus = sort;
-
-      const result = await requestCollection
-        .find(query)
-        .skip(page * size)
-        .limit(size)
-        .toArray();
-      res.send(result);
-    });
-
-    app.get('/empAll-request/:email', async (req, res) => {
-      const email = req.params.email;
-      const query = { reqEmail: email };
-
-      let currentDate = new Date();
-      let lastMonthDate = new Date();
-      lastMonthDate.setMonth(lastMonthDate.getMonth() - 1);
-
-      const result = await requestCollection
-        .find({
-          reqEmail: email,
-          reqDate: {
-            $gte: lastMonthDate.toISOString(),
-            $lt: currentDate.toISOString(),
-          },
-        })
-        .toArray();
-      // const result = await requestCollection.find(query).aggregate().toArray();
-      res.send(result);
-    });
-
     //get all requested asset for Hr manager ======<<<<<<<<<<<<<<
-
-    app.get(
-      '/requestedAssets-hrManger/:email',
-
-      async (req, res) => {
-        const email = req.params.email;
-        const size = parseInt(req.query.size);
-        const page = parseInt(req.query.page);
-        const search = req.query.search;
-
-        let query = {
-          posterEmail: email,
-        };
-        if (search) {
-          query = { reqName: { $regex: search, $options: 'i' } };
-        }
-
-        const result = await requestCollection
-          .find(query)
-          .skip(page * size)
-          .limit(size)
-          .toArray();
-        res.send(result);
-      }
-    );
 
     //update asset data
     app.put('/updateAsset/:id', async (req, res) => {
