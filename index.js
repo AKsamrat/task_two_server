@@ -136,6 +136,7 @@ async function run() {
       const sort = req.query.sort;
       const availability = req.query.availability;
       const dateSort = req.query.dateSort;
+      const range = req.query.range;
       let query = {
         // reqEmail: email,
       };
@@ -144,20 +145,41 @@ async function run() {
       }
       if (filter) query.brand = filter;
       if (availability) query.category = availability;
+      console.log(range);
+      let lowerValue = range - 100;
+      if (range === '100') query.price = { $gte: 0, $lte: 100 };
+      if (range === '200') query.price = { $gte: 101, $lte: 200 };
+      if (range === '300') query.price = { $gte: 201, $lte: 300 };
+      // if (range) {
+      //   if (range === '100') {
+      //     query = { price: { $gte: 0, $lte: 100 } };
+      //   } else if (range === '200') {
+      //     query = { price: { $gte: 101, $lte: 200 } };
+      //   } else if (range === '300') {
+      //     query = { price: { $gte: 201, $lte: 1000 } };
+      //   }
+      // }
+      console.log(query);
 
-      let options = {};
+      let option = {};
+      let option1 = {};
+
+      if (sort) {
+        option = { price: sort === 'asc' ? 1 : -1 };
+      }
+      if (dateSort) {
+        option = { added_time: dateSort === 'asc' ? 1 : -1 };
+      }
+
       let currentDate = new Date();
       let lastMonthDate = new Date();
       lastMonthDate.setMonth(lastMonthDate.getMonth() - 1);
-      if (dateSort)
-        query.added_time = {
-          $gte: lastMonthDate.toISOString(),
-          $lt: currentDate.toISOString(),
-        };
 
       const result = await productCollection
         .find(query)
-        .sort({ price: sort === 'asc' ? 1 : -1 })
+        .sort(option)
+        // price: sort === 'asc' ? 1 : -1,
+        // added_time: dateSort === 'asc' ? 1 : -1,
         .skip(page * size)
         .limit(size)
         .toArray();
