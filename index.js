@@ -49,11 +49,7 @@ async function run() {
       .db('assetManagement')
       .collection('messages');
 
-    //product collection api-----------------------
-
-    //save user data in db hr and employee
-
-    //get all asset api==========<<<<<<<<<<<<<<<
+    //get all product api==========<<<<<<<<<<<<<<<
     app.get('/all-product', async (req, res) => {
       const email = req.params.email;
       const size = parseInt(req.query.size);
@@ -113,7 +109,7 @@ async function run() {
       res.send(result);
     });
 
-    //pagination asset----------------------
+    //pagination product----------------------
 
     app.get('/assetsCount', async (req, res) => {
       const count = await productCollection.estimatedDocumentCount();
