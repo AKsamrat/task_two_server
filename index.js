@@ -113,22 +113,6 @@ async function run() {
       res.send(result);
     });
 
-    //get all requested asset for Hr manager ======<<<<<<<<<<<<<<
-
-    //update asset data
-    app.put('/updateAsset/:id', async (req, res) => {
-      const id = req.params.id;
-      const assetData = req.body;
-      const query = { _id: new ObjectId(id) };
-      const updateDoc = {
-        $set: assetData,
-      };
-      const result = await assetCollection.updateOne(query, updateDoc);
-      res.send(result);
-    });
-
-    // message section========================........>>>>>>>>>>>>>
-
     //pagination asset----------------------
 
     app.get('/assetsCount', async (req, res) => {
