@@ -33,18 +33,16 @@ To set up the client locally, follow these steps:
 To set up the server locally, follow these steps:
 
 ```bash
-VITE_API_URL = "http://localhost:5173"
+
 DB_USER= Your database user
 DB_PASS= Your Database Password
 ```
 
 ## Deployment
 
-1.  **Deploying to vercel**
+**Deploying to vercel**
 
-Create a new project :
-
-1. Install Firebase CLI:
+1. Open the terminal:
 
    ```bash
     vercel --prod
