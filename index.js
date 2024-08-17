@@ -35,19 +35,6 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     const productCollection = client.db('task_two').collection('product');
-    const userCollection = client.db('assetManagement').collection('users');
-    const assetCollection = client.db('assetManagement').collection('assets');
-    const paymentCollection = client
-      .db('assetManagement')
-      .collection('payments');
-    const teamCollection = client.db('assetManagement').collection('teams');
-    const teamsCollection = client.db('emaJohnDB').collection('products');
-    const requestCollection = client
-      .db('assetManagement')
-      .collection('requests');
-    const messageCollection = client
-      .db('assetManagement')
-      .collection('messages');
 
     //get all product api==========<<<<<<<<<<<<<<<
     app.get('/all-product', async (req, res) => {
